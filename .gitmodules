@@ -1,0 +1,3 @@
+[submodule "SympleEditor/vendor/glfw"]
+	path = SympleEditor/vendor/glfw
+	url = https://github.com/TeddyTelanoff/glfw
