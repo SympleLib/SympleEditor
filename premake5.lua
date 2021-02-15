@@ -29,15 +29,19 @@ project "SympleEditor"
 	includedirs {
 		"src",
 		
-		"vendor/glfw/include"
+		"vendor/glfw/include",
+		"vendor/glew/include",
 	}
 	
 	defines {
 		"null=0",
+		
+		"GLEW_STATIC",
 	}
 	
 	links {
 		"vendor/glfw/lib-vc2019/glfw3",
+		"vendor/glew/lib/Release/Win32/glew32s",
 		
 		"OpenGL32",
 	}
