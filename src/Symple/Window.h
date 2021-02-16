@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <list>
 #include <functional>
 
 #include <gl/glew.h>
@@ -11,23 +10,11 @@
 
 #include "Symple/Typedefs.h"
 
-namespace Symple
+namespace Symple::Window
 {
-	class Window
-	{
-	private:
-		GLFWwindow* mWindow;
-		std::string mTitle;
-		uint32 mWidth, mHeight;
+	GLFWwindow* New(const std::string& title = "Untitled Window", uint32 width = 1280, uint32 height = 720, GLFWmonitor* = null, GLFWwindow* share = null);
+	void Delete(GLFWwindow*);
 
-		std::function<void(const Window*)> mUpdateFn = [](const Window* win) {};
-
-		static std::list<const Window*> sWindows;
-	public:
-		Window(const std::string& title = "Untitled Window", uint32 width = 1280, uint32 height = 720);
-		~Window();
-
-		static void StartLoop();
-		void SetUpdateFunc(std::function<void(const Window*)>);
-	};
+	void BeginDraw(GLFWwindow*);
+	void EndDraw();
 }

@@ -24,9 +24,13 @@ int main(void)
 	if (!glfwInit())
 		exit(2);
 
-	Window win1;
-	//Window win2;
-	Window::StartLoop();
+	GLFWwindow* win = Window::New("Symple Editor");
 
+	while (!glfwWindowShouldClose(win))
+	{
+
+	}
+
+	Window::Delete(win);
 	glfwTerminate();
 }
