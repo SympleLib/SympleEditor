@@ -346,3 +346,8 @@ SympleCompiler/SympleCompiler.vcxproj
 *.vcxproj
 *.vcxproj
 SympleCompiler/SympleCompiler.vcxproj
+
+## Extra
+
+# ImGui Preferences
+imgui.ini
