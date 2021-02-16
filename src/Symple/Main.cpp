@@ -4,6 +4,19 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
+typedef int8_t  i8;
+typedef int16_t i16;
+typedef int32_t i32;
+typedef int64_t i64;
+
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+
+typedef float  f32;
+typedef double f64;
+
 int main(void)
 {
     GLFWwindow* window;
@@ -31,17 +44,27 @@ int main(void)
 
     glClearColor(.25f, .25f, .25f, 1.0f);
 
-    float vertices[] = {
+    f32 vertices[] = {
         -.5f,  .5f,
          .5f,  .5f,
          .5f, -.5f,
         -.5f, -.5f,
     };
 
-    GLuint vbo;
+    u8 indices[] = {
+        0, 1, 2,
+        0, 2, 3,
+    };
+
+    u32 vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(f32), vertices, GL_STATIC_DRAW);
+
+    u32 ibo;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 2 * 3 * sizeof(u32), indices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), null);
@@ -49,7 +72,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawElements(GL_TRIANGLES, 4 * 2, GL_UNSIGNED_BYTE, null);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
