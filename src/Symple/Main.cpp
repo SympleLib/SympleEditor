@@ -50,11 +50,13 @@ int main(void)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init();
-
 	auto& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -62,6 +64,11 @@ int main(void)
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGui::DockSpaceOverViewport();
+
+		ImGui::BeginMainMenuBar();
+		if (ImGui::MenuItem("Exit"))
+			break;
+		ImGui::EndMainMenuBar();
 
 		if (ImGui::Begin("Text Editor"))
 		{
@@ -75,8 +82,15 @@ int main(void)
 		}
 		ImGui::End();
 
+		ImGui::ShowDemoWindow();
+
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		GLFWwindow* backupWin = glfwGetCurrentContext();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		glfwMakeContextCurrent(backupWin);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
