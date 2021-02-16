@@ -24,6 +24,11 @@ project "SympleEditor"
 		
 		"src/**.c",
 		"src/**.cpp",
+		
+		
+		"vendor/imgui/*.cpp",
+		"vendor/imgui/backends/imgui_impl_glfw.cpp",
+		"vendor/imgui/backends/imgui_impl_opengl3.cpp",
 	}
 	
 	includedirs {
@@ -31,12 +36,15 @@ project "SympleEditor"
 		
 		"vendor/glfw/include",
 		"vendor/glew/include",
+		"vendor/imgui",
+		"vendor/imgui/backends",
 	}
 	
 	defines {
 		"null=0",
 		
 		"GLEW_STATIC",
+		"IMGUI_IMPL_OPENGL_LOADER_GLEW",
 	}
 	
 	links {

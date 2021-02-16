@@ -4,6 +4,11 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 typedef int8_t  i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -19,64 +24,92 @@ typedef double f64;
 
 int main(void)
 {
-    GLFWwindow* window;
+	GLFWwindow* window;
 
-    if (!glfwInit())
-        return 1;
+	if (!glfwInit())
+		return 1;
 
-    window = glfwCreateWindow(1280, 720, "Hello World", null, null);
-    if (!window)
-    {
-        glfwTerminate();
-        return 1;
-    }
+	window = glfwCreateWindow(1280, 720, "Hello World", null, null);
+	if (!window)
+	{
+		glfwTerminate();
+		return 1;
+	}
 
 #if !__SY_DEBUG
-    FreeConsole();
+	FreeConsole();
 #endif
 
-    glfwMakeContextCurrent(window);
-    
-    if (glewInit() != GLEW_OK)
-        return 2;
+	glfwMakeContextCurrent(window);
+	
+	if (glewInit() != GLEW_OK)
+		return 2;
 
-    puts((const char*)glGetString(GL_VERSION));
+	puts((const char*)glGetString(GL_VERSION));
+	glClearColor(.25f, .25f, .25f, 1.0f);
 
-    glClearColor(.25f, .25f, .25f, 1.0f);
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
 
-    f32 vertices[] = {
-        -.5f,  .5f,
-         .5f,  .5f,
-         .5f, -.5f,
-        -.5f, -.5f,
-    };
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
 
-    u8 indices[] = {
-        0, 1, 2,
-        0, 2, 3,
-    };
+	auto& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiWindowFlags_NoBackground;
 
-    u32 vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(f32), vertices, GL_STATIC_DRAW);
+	f32 vertices[] = {
+		-.5f,  .5f,
+		 .5f,  .5f,
+		 .5f, -.5f,
+		-.5f, -.5f,
+	};
 
-    u32 ibo;
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 2 * 3 * sizeof(u32), indices, GL_STATIC_DRAW);
+	u8 indices[] = {
+		0, 1, 2,
+		0, 2, 3,
+	};
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), null);
+	u32 vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(f32), vertices, GL_STATIC_DRAW);
 
-    while (!glfwWindowShouldClose(window))
-    {
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawElements(GL_TRIANGLES, 4 * 2, GL_UNSIGNED_BYTE, null);
+	u32 ibo;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 2 * 3 * sizeof(u32), indices, GL_STATIC_DRAW);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), null);
 
-    glfwTerminate();
+	bool textEditorPOpen = true;
+	while (!glfwWindowShouldClose(window))
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDrawElements(GL_TRIANGLES, 4 * 2, GL_UNSIGNED_BYTE, null);
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::DockSpaceOverViewport();
+
+		if (textEditorPOpen && ImGui::Begin("Text Editor", &textEditorPOpen))
+		{
+			ImGui::Text("This is your code");
+			ImGui::End();
+		}
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+
+	ImGui::DestroyContext();
+	glfwTerminate();
 }
