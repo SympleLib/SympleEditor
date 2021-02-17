@@ -9,21 +9,12 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-typedef int8_t  i8;
-typedef int16_t i16;
-typedef int32_t i32;
-typedef int64_t i64;
-
-typedef uint8_t  u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-
-typedef float  f32;
-typedef double f64;
+#include "Symple/Typedefs.h"
+#include "Symple/Panel.h"
 
 int main(void)
 {
+	using namespace Symple;
 	GLFWwindow* window;
 
 	if (!glfwInit())
@@ -58,6 +49,20 @@ int main(void)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
+	struct TextEditorPanel : Panel
+	{
+		char buff[4096] = "New File";
+
+		TextEditorPanel()
+			: Panel("Text Editor")
+		{
+			DrawFn = [this]()
+			{
+				ImGui::Text(buff);
+			};
+		}
+	} textEditor;
+
 	while (!glfwWindowShouldClose(window))
 	{
 		ImGui_ImplOpenGL3_NewFrame();
@@ -70,19 +75,7 @@ int main(void)
 			break;
 		ImGui::EndMainMenuBar();
 
-		if (ImGui::Begin("Text Editor"))
-		{
-			ImGui::Text("This is your code");
-		}
-		ImGui::End();
-
-		if (ImGui::Begin("Test"))
-		{
-			ImGui::Text("Test");
-		}
-		ImGui::End();
-
-		ImGui::ShowDemoWindow();
+		textEditor.Draw();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
