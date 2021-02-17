@@ -13,7 +13,9 @@
 #include "Symple/Panel.h"
 
 ImVec2 operator -(const ImVec2& l, const ImVec2& r)
-{ return ImVec2(l.x - r.x, l.y - r.y); }
+{
+	return ImVec2(l.x - r.x, l.y - r.y);
+}
 
 int main(void)
 {
@@ -74,12 +76,14 @@ int main(void)
 			DrawFn = [this]()
 			{
 				ImVec2 min = ImGui::GetWindowContentRegionMin();
-				ImVec2 max = ImGui::GetWindowContentRegionMax();
-				
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
+				ImVec2 max = ImGui::GetWindowContentRegionMax(); max.y /= 2;
+
+				ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.15, .15, .15, 1));
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.75, .75, .75, 1));
 				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min) && !Edited)
 					Title = Filename + "*###" + Filename;
-				ImGui::PopStyleColor();
+				ImGui::Text(Text);
+				ImGui::PopStyleColor(2);
 
 				if ((ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL) || ImGui::IsKeyDown(GLFW_KEY_RIGHT_CONTROL)) && ImGui::IsKeyDown(GLFW_KEY_S))
 				{
