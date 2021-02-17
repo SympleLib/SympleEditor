@@ -12,6 +12,9 @@
 #include "Symple/Typedefs.h"
 #include "Symple/Panel.h"
 
+ImVec2 operator -(const ImVec2& l, const ImVec2& r)
+{ return ImVec2(l.x - r.x, l.y - r.y); }
+
 int main(void)
 {
 	using namespace Symple;
@@ -45,6 +48,9 @@ int main(void)
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiWindowFlags_HorizontalScrollbar;
+
+	io.FontDefault = io.Fonts->AddFontFromFileTTF("res/fonts/CascadiaCode.ttf", 16);
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
@@ -54,17 +60,15 @@ int main(void)
 		char Text[4096] = "";
 
 		TextEditorPanel(const std::string& filename = "new")
-			: Panel(filename + "##0")
+			: Panel(filename + " 0")
 		{
 			DrawFn = [this]()
 			{
-				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text)))
-				{
-					char* c = Text;
-					while (*c++) // lol
-						if (*c == 'a')
-							exit(*c);
-				}
+				ImVec2 min = ImGui::GetWindowContentRegionMin();
+				ImVec2 max = ImGui::GetWindowContentRegionMax();
+				
+				//ImGui::GetForegroundDrawList()->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
+				ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min);
 			};
 		}
 	} textEditor;
@@ -77,8 +81,10 @@ int main(void)
 		ImGui::DockSpaceOverViewport();
 
 		ImGui::BeginMainMenuBar();
-		if (ImGui::MenuItem("Exit"))
+		//ImGui::BeginMenu("File");
+		if (ImGui::MenuItem("Exit", "Escape") || ImGui::IsKeyReleased(GLFW_KEY_ESCAPE))
 			break;
+		//ImGui::EndMenu();
 		ImGui::EndMainMenuBar();
 
 		textEditor.Draw();
