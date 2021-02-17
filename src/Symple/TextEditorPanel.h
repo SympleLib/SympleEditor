@@ -36,8 +36,18 @@ namespace Symple
 
 				ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.15, .15, .15, 1));
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.75, .75, .75, 1));
-				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min) && !Edited)
-					Title = Filename + "*###" + Filename;
+				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min))
+				{
+					if (!Edited)
+						Title = Filename + "*###" + Filename;
+
+					Tokens.clear();
+					shared_ptr<Syntax::Token> tok;
+					unique_ptr<Syntax::Lexer> lexer = make_unique<Syntax::Lexer>((char*)"<NA>", std::string(Text));
+					while (!(tok = lexer->Lex())->Is(Syntax::Token::EndOfFile))
+						Tokens.push_back(tok);
+					lexer.release();
+				}
 				ImGui::PopStyleColor();
 				for (auto tok : Tokens)
 				{
