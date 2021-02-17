@@ -109,7 +109,7 @@ namespace Symple
 					auto tr = Tokens[i]->GetTrivia();
 					if (tr->Is(Syntax::Trivia::StartOfLine))
 						ImGui::NewLine();
-					ImGui::TextColored(col, "%s%s", tr->GetText().data(), Tokens[i]->GetText().data());
+					ImGui::TextColored(col, "%s", Tokens[i]->GetText().data());
 					ImGui::SameLine();
 				}
 				ImGui::PopStyleColor();
