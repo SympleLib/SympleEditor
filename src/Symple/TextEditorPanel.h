@@ -101,7 +101,7 @@ namespace Symple
 
 					const char* c = &GetChar(Text, Tokens[i]->GetColumn() + Tokens[i]->GetText().length(), Tokens[i]->GetLine());
 					std::string trivia = c;
-					int32 dist = &GetChar(Text, Tokens[i + 1]->GetColumn(), Tokens[i + 1]->GetLine()) - c;
+					int32 dist = &GetChar(Text, Tokens[i + 1]->GetColumn(), Tokens[i + 1]->GetLine()) - c + 1;
 					printf("Dist: %i\n", dist);
 					trivia.resize(dist);
 					ImGui::TextColored(col, "%s%s", Tokens[i]->GetText().data(), trivia.c_str());
