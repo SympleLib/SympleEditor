@@ -39,12 +39,11 @@ project "SympleEditor"
 		"vendor/imgui",
 		"vendor/imgui/backends",
 		
-		"vendor/SympleCode/inc",
+		"vendor/SympleCode/SympleLang/inc",
+		"vendor/SympleCode/SympleLang/vendor/spdlog/include",
 	}
 	
 	defines {
-		"null=0",
-		
 		"GLEW_STATIC",
 		"IMGUI_IMPL_OPENGL_LOADER_GLEW",
 	}
