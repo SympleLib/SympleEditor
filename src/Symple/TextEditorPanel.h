@@ -5,13 +5,14 @@
 #include <GLFW/glfw3.h>
 
 #include <SympleCode/Syntax/Lexer.h>
+#include <SympleCode/Util/FileUtil.h>
 
 namespace Symple
 {
 	ImVec2 operator -(const ImVec2& l, const ImVec2& r)
 	{ return ImVec2(l.x - r.x, l.y - r.y); }
 
-	const char& GetChar(std::string_view str, uint32 col, uint32 ln)
+	const char& GetChar(const char* str, uint32 col, uint32 ln)
 	{
 		std::string_view view = str;
 		for (uint32 l = 0; l < ln; l++)
@@ -24,7 +25,6 @@ namespace Symple
 	struct TextEditorPanel : Panel
 	{
 		char Text[4096] = "";
-		std::string_view TextView = Text;
 		std::string Filename;
 		bool Edited = false;
 
@@ -36,14 +36,15 @@ namespace Symple
 			FILE* fs = fopen(Filename.c_str(), "rb");
 			if (fs)
 			{
-				fgets(Text, sizeof(Text), fs);
+				strcpy(Text, Util::ReadFile(fs, 4096).c_str());
 				fclose(fs);
 			}
 
 			shared_ptr<Syntax::Token> tok;
-			Syntax::Lexer lexer(NULL, (std::string)TextView);
-			while (!(tok = lexer.Lex())->Is(Syntax::Token::EndOfFile))
-				Tokens.push_back(tok);
+			Syntax::Lexer lexer(NULL, (std::string)Text);
+			do
+				Tokens.push_back(lexer.Lex());
+			while (!Tokens.back()->Is(Syntax::Token::EndOfFile));
 
 			DrawFn = [this]()
 			{
@@ -73,16 +74,16 @@ namespace Symple
 						Title = Filename + "*###" + Filename;
 
 					Tokens.clear();
-					shared_ptr<Syntax::Token> tok;
 					Syntax::Lexer lexer(NULL, (std::string)Text);
-					while (!(tok = lexer.Lex())->Is(Syntax::Token::EndOfFile))
-						Tokens.push_back(tok);
+					do
+						Tokens.push_back(lexer.Lex());
+					while (!Tokens.back()->Is(Syntax::Token::EndOfFile));
 				}
 				ImGui::PopStyleColor();
-				for (auto tok : Tokens)
+				for (uint32 i = 0; i < Tokens.size() - 1; i++)
 				{
 					ImVec4 col;
-					switch (tok->GetKind())
+					switch (Tokens[i]->GetKind())
 					{
 					case Syntax::Token::Unknown:
 						col = ImVec4(1, 0, 0, 1);
@@ -91,15 +92,19 @@ namespace Symple
 						col = ImVec4(.75, .75, .75, 1);
 						break;
 					default:
-						col = ImVec4(.75, .75, 1, 1);
+						col = ImVec4(.25, 1, 1, 1);
 						break;
 					}
 
-					if (tok->IsKeyword())
+					if (Tokens[i]->IsKeyword())
 						col = ImVec4(1, 0, 1, 1);
 
-					std::string_view c = &GetChar(TextView, tok->GetColumn(), tok->GetLine());
-					ImGui::TextColored(col, "%s %c %i", tok->GetText().data(), c[tok->GetText().length() - 1], c.data() - Text);
+					const char* c = &GetChar(Text, Tokens[i]->GetColumn() + Tokens[i]->GetText().length(), Tokens[i]->GetLine());
+					std::string trivia = c;
+					int32 dist = &GetChar(Text, Tokens[i + 1]->GetColumn(), Tokens[i + 1]->GetLine()) - c;
+					printf("Dist: %i\n", dist);
+					trivia.resize(dist);
+					ImGui::TextColored(col, "%s%s", Tokens[i]->GetText().data(), trivia.c_str());
 					ImGui::SameLine();
 				}
 				ImGui::PopStyleColor();
