@@ -34,27 +34,6 @@ namespace Symple
 				ImVec2 min = ImGui::GetWindowContentRegionMin();
 				ImVec2 max = ImGui::GetWindowContentRegionMax(); max.y /= 2;
 
-				ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.15, .15, .15, 1));
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.75, .75, .75, 1));
-				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min))
-				{
-					if (!Edited)
-						Title = Filename + "*###" + Filename;
-
-					Tokens.clear();
-					shared_ptr<Syntax::Token> tok;
-					unique_ptr<Syntax::Lexer> lexer = make_unique<Syntax::Lexer>((char*)"<NA>", std::string(Text));
-					while (!(tok = lexer->Lex())->Is(Syntax::Token::EndOfFile))
-						Tokens.push_back(tok);
-					lexer.release();
-				}
-				ImGui::PopStyleColor();
-				for (auto tok : Tokens)
-				{
-					ImGui::TextColored(tok->GetKind() > Syntax::Token::VoidKeyword ? ImVec4(1, 0, 1, 1) : ImVec4(.75, .75, .75, 1), "%s ", tok->GetText().data());
-				}
-				ImGui::PopStyleColor();
-
 				if ((ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL) || ImGui::IsKeyDown(GLFW_KEY_RIGHT_CONTROL)) && ImGui::IsKeyDown(GLFW_KEY_S))
 				{
 					FILE* fs = fopen(Filename.c_str(), "wb");
@@ -66,7 +45,48 @@ namespace Symple
 						Edited = false;
 						Title = Filename + "###" + Filename;
 					}
+
+					return;
 				}
+
+				ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.15, .15, .15, 1));
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.75, .75, .75, 1));
+				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min))
+				{
+					if (!Edited)
+						Title = Filename + "*###" + Filename;
+
+					Tokens.clear();
+					shared_ptr<Syntax::Token> tok;
+					char f[] = "<NA>";
+					Syntax::Lexer lexer(f, (std::string)Text);
+					while (!(tok = lexer.Lex())->Is(Syntax::Token::EndOfFile))
+						Tokens.push_back(tok);
+				}
+				ImGui::PopStyleColor();
+				for (auto tok : Tokens)
+				{
+					ImVec4 col;
+					switch (tok->GetKind())
+					{
+					case Syntax::Token::Unknown:
+						col = ImVec4(1, 0, 0, 1);
+						break;
+					case Syntax::Token::Identifier:
+						col = ImVec4(.75, .75, .75, 1);
+						break;
+					default:
+						col = ImVec4(.75, .75, .8, 1);
+						break;
+					}
+
+					if (tok->IsKeyword())
+						col = ImVec4(1, 0, 1, 1);
+
+					ImGui::TextColored(col, "%s ", tok->GetText().data());
+					ImGui::SameLine();
+				}
+				ImGui::PopStyleColor();
 			};
 		}
 	};

@@ -29,6 +29,13 @@ project "SympleEditor"
 		"vendor/imgui/*.cpp",
 		"vendor/imgui/backends/imgui_impl_glfw.cpp",
 		"vendor/imgui/backends/imgui_impl_opengl3.cpp",
+		
+		
+		"vendor/SympleCode/SympleLang/src/**.h",
+		"vendor/SympleCode/SympleLang/src/**.hpp",
+		
+		"vendor/SympleCode/SympleLang/src/**.c",
+		"vendor/SympleCode/SympleLang/src/**.cpp",
 	}
 	
 	includedirs {

@@ -63,10 +63,8 @@ int main(void)
 		ImGui::DockSpaceOverViewport();
 
 		ImGui::BeginMainMenuBar();
-		//ImGui::BeginMenu("File");
 		if (ImGui::MenuItem("Exit", "Escape") || ImGui::IsKeyReleased(GLFW_KEY_ESCAPE))
 			break;
-		//ImGui::EndMenu();
 		ImGui::EndMainMenuBar();
 
 		textEditor.Draw();
