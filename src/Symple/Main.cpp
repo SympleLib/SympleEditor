@@ -62,30 +62,40 @@ int main(void)
 		bool Edited = false;
 
 		TextEditorPanel(const std::string& filename = "new")
-			: Panel(filename), Filename(filename)
+			: Panel(filename + "###" + filename), Filename(filename)
 		{
+			FILE* fs = fopen(Filename.c_str(), "rb");
+			if (fs)
+			{
+				fgets(Text, sizeof(Text), fs);
+				fclose(fs);
+			}
+
 			DrawFn = [this]()
 			{
 				ImVec2 min = ImGui::GetWindowContentRegionMin();
 				ImVec2 max = ImGui::GetWindowContentRegionMax();
 				
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
 				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min) && !Edited)
-				{
-					Title = Filename + '*';
-				}
+					Title = Filename + "*###" + Filename;
+				ImGui::PopStyleColor();
 
 				if ((ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL) || ImGui::IsKeyDown(GLFW_KEY_RIGHT_CONTROL)) && ImGui::IsKeyDown(GLFW_KEY_S))
 				{
 					FILE* fs = fopen(Filename.c_str(), "wb");
-					fputs(Text, fs);
-					fclose(fs);
+					if (fs)
+					{
+						fputs(Text, fs);
+						fclose(fs);
 
-					Edited = false;
-					Title = Filename;
+						Edited = false;
+						Title = Filename + "###" + Filename;
+					}
 				}
 			};
 		}
-	} textEditor("test/Main.c");
+	} textEditor("test/Main.sy");
 
 	while (!glfwWindowShouldClose(window))
 	{

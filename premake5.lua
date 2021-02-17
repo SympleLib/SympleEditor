@@ -38,6 +38,8 @@ project "SympleEditor"
 		"vendor/glew/include",
 		"vendor/imgui",
 		"vendor/imgui/backends",
+		
+		"vendor/SympleCode/inc",
 	}
 	
 	defines {
@@ -52,6 +54,7 @@ project "SympleEditor"
 		"vendor/glew/lib/Release/Win32/glew32s",
 		
 		"OpenGL32",
+		"vendor/SympleLang",
 	}
 	
 	filter "configurations:Debug"
