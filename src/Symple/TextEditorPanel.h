@@ -29,6 +29,11 @@ namespace Symple
 				fclose(fs);
 			}
 
+			shared_ptr<Syntax::Token> tok;
+			Syntax::Lexer lexer(NULL, (std::string)Text);
+			while (!(tok = lexer.Lex())->Is(Syntax::Token::EndOfFile))
+				Tokens.push_back(tok);
+
 			DrawFn = [this]()
 			{
 				ImVec2 min = ImGui::GetWindowContentRegionMin();
@@ -58,8 +63,7 @@ namespace Symple
 
 					Tokens.clear();
 					shared_ptr<Syntax::Token> tok;
-					char f[] = "<NA>";
-					Syntax::Lexer lexer(f, (std::string)Text);
+					Syntax::Lexer lexer(NULL, (std::string)Text);
 					while (!(tok = lexer.Lex())->Is(Syntax::Token::EndOfFile))
 						Tokens.push_back(tok);
 				}
@@ -76,14 +80,14 @@ namespace Symple
 						col = ImVec4(.75, .75, .75, 1);
 						break;
 					default:
-						col = ImVec4(.75, .75, .8, 1);
+						col = ImVec4(.75, .75, 1, 1);
 						break;
 					}
 
 					if (tok->IsKeyword())
 						col = ImVec4(1, 0, 1, 1);
 
-					ImGui::TextColored(col, "%s ", tok->GetText().data());
+					ImGui::TextColored(col, "%s %c", tok->GetText().data(), Text[tok->GetColumn()]);
 					ImGui::SameLine();
 				}
 				ImGui::PopStyleColor();
