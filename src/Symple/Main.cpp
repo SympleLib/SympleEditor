@@ -13,9 +13,7 @@
 #include "Symple/Panel.h"
 
 ImVec2 operator -(const ImVec2& l, const ImVec2& r)
-{
-	return ImVec2(l.x - r.x, l.y - r.y);
-}
+{ return ImVec2(l.x - r.x, l.y - r.y); }
 
 int main(void)
 {
@@ -41,7 +39,7 @@ int main(void)
 	if (glewInit() != GLEW_OK)
 		return 2;
 
-	puts((const char*)glGetString(GL_VERSION));
+	printf("[#]: OpenGL Version: %s", glGetString(GL_VERSION));
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
