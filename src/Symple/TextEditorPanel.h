@@ -43,8 +43,10 @@ namespace Symple
 			shared_ptr<Syntax::Token> tok;
 			Syntax::Lexer lexer(NULL, (std::string)Text);
 			do
+			{
 				Tokens.push_back(lexer.Lex());
-			while (!Tokens.back()->Is(Syntax::Token::EndOfFile));
+				Tokens.back()->Print(std::cout, "\n", Tokens.back()->Is(Syntax::Token::EndOfFile));
+			} while (!Tokens.back()->Is(Syntax::Token::EndOfFile));
 
 			DrawFn = [this]()
 			{
@@ -76,14 +78,19 @@ namespace Symple
 					Tokens.clear();
 					Syntax::Lexer lexer(NULL, (std::string)Text);
 					do
+					{
 						Tokens.push_back(lexer.Lex());
+						Tokens.back()->Print(std::cout, "\n", Tokens.back()->Is(Syntax::Token::EndOfFile));
+					}
 					while (!Tokens.back()->Is(Syntax::Token::EndOfFile));
 				}
 				ImGui::PopStyleColor();
-				for (uint32 i = 0; i < Tokens.size() - 1; i++)
+
+				ImGui::NewLine();
+				for (auto tok : Tokens)
 				{
 					ImVec4 col;
-					switch (Tokens[i]->GetKind())
+					switch (tok->GetKind())
 					{
 					case Syntax::Token::Unknown:
 						col = ImVec4(1, 0, 0, 1);
@@ -96,16 +103,13 @@ namespace Symple
 						break;
 					}
 
-					if (Tokens[i]->IsKeyword())
+					if (tok->IsKeyword())
 						col = ImVec4(1, 0, 1, 1);
 
-					const char* c = &GetChar(Text, Tokens[i]->GetColumn() + Tokens[i]->GetText().length(), Tokens[i]->GetLine());
-					std::string trivia = c;
-					int32 dist = &GetChar(Text, Tokens[i + 1]->GetColumn(), Tokens[i + 1]->GetLine()) - c + 1;
-					printf("Dist: %i\n", dist);
-					trivia.resize(dist);
-					ImGui::TextColored(col, "%s%s", Tokens[i]->GetText().data(), trivia.c_str());
-					ImGui::SameLine();
+					auto tr = tok->GetTrivia();
+					if (!tr->Is(Syntax::Trivia::StartOfLine) || tok == Tokens.front())
+						ImGui::SameLine();
+					ImGui::TextColored(col, "%s%s", tr->GetText().data(), tok->GetText().data());
 				}
 				ImGui::PopStyleColor();
 			};
