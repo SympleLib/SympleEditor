@@ -51,14 +51,20 @@ int main(void)
 
 	struct TextEditorPanel : Panel
 	{
-		char buff[4096] = "New File";
+		char Text[4096] = "";
 
-		TextEditorPanel()
-			: Panel("Text Editor")
+		TextEditorPanel(const std::string& filename = "new")
+			: Panel(filename + "##0")
 		{
 			DrawFn = [this]()
 			{
-				ImGui::Text(buff);
+				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text)))
+				{
+					char* c = Text;
+					while (*c++) // lol
+						if (*c == 'a')
+							exit(*c);
+				}
 			};
 		}
 	} textEditor;
