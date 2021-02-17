@@ -11,9 +11,18 @@ namespace Symple
 	ImVec2 operator -(const ImVec2& l, const ImVec2& r)
 	{ return ImVec2(l.x - r.x, l.y - r.y); }
 
+	const char& GetChar(std::string_view str, uint32 col, uint32 ln)
+	{
+		for (uint32 l = 0; l < ln; l++)
+			str = str.substr(str.find('\n') + 1);
+		str = str.substr(std::min(col, str.length() - 1));
+		return *str.data();
+	}
+
 	struct TextEditorPanel : Panel
 	{
 		char Text[4096] = "";
+		std::string_view TextView = Text;
 		std::string Filename;
 		bool Edited = false;
 
@@ -30,7 +39,7 @@ namespace Symple
 			}
 
 			shared_ptr<Syntax::Token> tok;
-			Syntax::Lexer lexer(NULL, (std::string)Text);
+			Syntax::Lexer lexer(NULL, (std::string)TextView);
 			while (!(tok = lexer.Lex())->Is(Syntax::Token::EndOfFile))
 				Tokens.push_back(tok);
 
@@ -87,7 +96,8 @@ namespace Symple
 					if (tok->IsKeyword())
 						col = ImVec4(1, 0, 1, 1);
 
-					ImGui::TextColored(col, "%s %c", tok->GetText().data(), Text[tok->GetColumn()]);
+					const char* c = &GetChar(TextView, tok->GetColumn(), tok->GetLine());
+					ImGui::TextColored(col, "%s %c %c", tok->GetText().data(), c[tok->GetText().length() - 1]);
 					ImGui::SameLine();
 				}
 				ImGui::PopStyleColor();

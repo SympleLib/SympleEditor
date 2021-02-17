@@ -38,6 +38,10 @@ project "SympleEditor"
 		"vendor/SympleCode/SympleLang/src/**.cpp",
 	}
 	
+	excludes {
+		"vendor/SympleCode/SympleLang/src/Main.cpp",
+	}
+	
 	includedirs {
 		"src",
 		
@@ -51,6 +55,7 @@ project "SympleEditor"
 	}
 	
 	defines {
+		"NOMINMAX",
 		"GLEW_STATIC",
 		"IMGUI_IMPL_OPENGL_LOADER_GLEW",
 	}
@@ -60,7 +65,7 @@ project "SympleEditor"
 		"vendor/glew/lib/Release/Win32/glew32s",
 		
 		"OpenGL32",
-		"vendor/SympleLang",
+		-- "vendor/SympleLang",
 	}
 	
 	filter "configurations:Debug"
