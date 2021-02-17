@@ -87,10 +87,10 @@ namespace Symple
 				ImGui::PopStyleColor();
 
 				ImGui::NewLine();
-				for (auto tok : Tokens)
+				for (uint32 i = 0; i < Tokens.size() - 1; i++)
 				{
 					ImVec4 col;
-					switch (tok->GetKind())
+					switch (Tokens[i]->GetKind())
 					{
 					case Syntax::Token::Unknown:
 						col = ImVec4(1, 0, 0, 1);
@@ -103,13 +103,14 @@ namespace Symple
 						break;
 					}
 
-					if (tok->IsKeyword())
+					if (Tokens[i]->IsKeyword())
 						col = ImVec4(1, 0, 1, 1);
 
-					auto tr = tok->GetTrivia();
-					if (!tr->Is(Syntax::Trivia::StartOfLine) || tok == Tokens.front())
-						ImGui::SameLine();
-					ImGui::TextColored(col, "%s%s", tr->GetText().data(), tok->GetText().data());
+					auto tr = Tokens[i]->GetTrivia();
+					if (tr->Is(Syntax::Trivia::StartOfLine))
+						ImGui::NewLine();
+					ImGui::TextColored(col, "%s%s", tr->GetText().data(), Tokens[i]->GetText().data());
+					ImGui::SameLine();
 				}
 				ImGui::PopStyleColor();
 			};
