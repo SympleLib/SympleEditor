@@ -13,10 +13,12 @@ namespace Symple
 
 	const char& GetChar(std::string_view str, uint32 col, uint32 ln)
 	{
+		std::string_view view = str;
 		for (uint32 l = 0; l < ln; l++)
-			str = str.substr(str.find('\n') + 1);
-		str = str.substr(std::min(col, str.length() - 1));
-		return *str.data();
+			view = view.substr(view.find('\n') + 1);
+		if (view.length())
+			view = view.substr(std::min(col, view.length() - 1));
+		return *view.data();
 	}
 
 	struct TextEditorPanel : Panel
@@ -96,8 +98,8 @@ namespace Symple
 					if (tok->IsKeyword())
 						col = ImVec4(1, 0, 1, 1);
 
-					const char* c = &GetChar(TextView, tok->GetColumn(), tok->GetLine());
-					ImGui::TextColored(col, "%s %c %c", tok->GetText().data(), c[tok->GetText().length() - 1]);
+					std::string_view c = &GetChar(TextView, tok->GetColumn(), tok->GetLine());
+					ImGui::TextColored(col, "%s %c %i", tok->GetText().data(), c[tok->GetText().length() - 1], c.data() - Text);
 					ImGui::SameLine();
 				}
 				ImGui::PopStyleColor();
