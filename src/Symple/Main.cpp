@@ -58,20 +58,34 @@ int main(void)
 	struct TextEditorPanel : Panel
 	{
 		char Text[4096] = "";
+		std::string Filename;
+		bool Edited = false;
 
 		TextEditorPanel(const std::string& filename = "new")
-			: Panel(filename + " 0")
+			: Panel(filename), Filename(filename)
 		{
 			DrawFn = [this]()
 			{
 				ImVec2 min = ImGui::GetWindowContentRegionMin();
 				ImVec2 max = ImGui::GetWindowContentRegionMax();
 				
-				//ImGui::GetForegroundDrawList()->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
-				ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min);
+				if (ImGui::InputTextMultiline("##TextEditor.Text.0", Text, sizeof(Text), max - min) && !Edited)
+				{
+					Title = Filename + '*';
+				}
+
+				if ((ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL) || ImGui::IsKeyDown(GLFW_KEY_RIGHT_CONTROL)) && ImGui::IsKeyDown(GLFW_KEY_S))
+				{
+					FILE* fs = fopen(Filename.c_str(), "wb");
+					fputs(Text, fs);
+					fclose(fs);
+
+					Edited = false;
+					Title = Filename;
+				}
 			};
 		}
-	} textEditor;
+	} textEditor("test/Main.c");
 
 	while (!glfwWindowShouldClose(window))
 	{
